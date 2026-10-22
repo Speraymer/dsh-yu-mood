@@ -12,7 +12,7 @@
  * ============================================================================
  */
 window.__ModuleLoader__.load({
-  id: 'dsh-feiyu-mood',
+  id: 'dsh-yu-mood',
   factory: (require) => {
     const React = require('react')
     const h = React.createElement
