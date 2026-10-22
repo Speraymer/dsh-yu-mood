@@ -1,0 +1,49 @@
+# 依赖与运行产物
+node_modules/
+.pnpm-store/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# 日志
+*.log
+logs/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 临时文件
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+.cache/
+.tmp/
+
+# 测试与覆盖率
+coverage/
+.nyc_output/
+*.tsbuildinfo
+
+# 打包产物
+*.tgz
+*.tar.gz
+dist/
+build/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 本机私有配置与凭证（别提交）
+.env
+.env.*
+*.local.json
+.credentials*
+*secret*
+*private*
