@@ -2,11 +2,11 @@
 
 ## 来源与改动
 
-- 基于 **Yuuyuko-uu/dsh-feiyu-mood** 0.4.2（<https://github.com/Yuuyuko-uu/dsh-feiyu-mood>，MIT）。
+- 基于 **Yuuyuko-uu/dsh-feiyu-mood** 1.0.0（<https://github.com/Yuuyuko-uu/dsh-feiyu-mood>，MIT）。
   版权与声明见 [LICENSE](LICENSE) 和 [NOTICE.md](NOTICE.md)。
 - 本仓改动（多房间）：数值全局一份、**理由按会话分房间**存与注入；挂载从「一个会话」改成「所有会话 / 指定会话」；
   自然平复写进共用房间；日上限按会话算；v1 状态自动迁移。
-- 已合入上游 0.4.1 / 0.4.2 的可移植性修复：**默认不再盯任何写死的会话**（没选就什么都不做）、
+- 已合入上游 1.0.0 / 1.0.0 的可移植性修复：**默认不再盯任何写死的会话**（没选就什么都不做）、
   「TA 自己叫什么」默认值是中性的「伙伴」、「TA 叫什么」默认「对方」、界面文案里的「她」全部改成「它」。
 - ⚠ **内部 ID、路由、数据目录仍沿用旧名**（cordis `id: mood`、`/dsh-feiyu-mood/*`、`~/.dsh/feiyu-mood/`），
   这样能和上游版本互相降级而不丢数据。
