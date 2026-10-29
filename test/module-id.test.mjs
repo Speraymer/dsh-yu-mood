@@ -23,3 +23,7 @@ test('前端注册 id 必须等于包名', () => {
   }
   assert.ok(找到 > 0, '没有找到真正的 __ModuleLoader__.load({ id: ... }) 注册点')
 })
+
+test('前端只强依赖 slots，缺少可选 UI 服务也能加载', () => {
+  assert.deepEqual(pkg.dsh.client.inject, ['slots'])
+})

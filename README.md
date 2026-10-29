@@ -1,5 +1,9 @@
 # dsh-yu-mood ｜ 鱼的心情
 
+## 给 Agent 的安装与验收
+
+执行 `dsh plugin --profile desktop add github:Speraymer/dsh-yu-mood`，重启 DSH；确认“设置 → 心情”和右下角挂件出现，`dsh --profile desktop --dump-config` 退出码为 0。模型不可用时保留默认设置并明确提示用户选择模型。
+
 ## 一、它是怎么"有心情"的
 
 ```

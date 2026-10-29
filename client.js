@@ -134,7 +134,7 @@ window.__ModuleLoader__.load({
         }
         setUpBusy('')
       }
-      const 更新命令 = ['dsh plugin --profile web remove dsh-feiyu-mood', 'dsh plugin --profile web add dsh-feiyu-mood'].join(String.fromCharCode(10))
+      const 更新命令 = 'dsh plugin --profile desktop add github:Speraymer/dsh-yu-mood'
 
       const onReset = async () => {
         setBusy('reset')
