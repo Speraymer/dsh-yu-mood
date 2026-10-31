@@ -123,7 +123,6 @@ window.__ModuleLoader__.load({
       const [设置, set设置] = React.useState(null)
       const [状态, set状态] = React.useState(null)
       const [会话们, set会话们] = React.useState([])
-      const [厂商们, set厂商们] = React.useState([])
       const [版本, set版本] = React.useState(null)
       const [忙, set忙] = React.useState('')
       const [提示, set提示] = React.useState('')
@@ -156,7 +155,6 @@ window.__ModuleLoader__.load({
       React.useEffect(() => {
         拉一次()
         取(B + '/sessions').then((r) => set会话们((r && r.sessions) || [])).catch(() => {})
-        取(B + '/models').then((r) => set厂商们((r && r.providers) || [])).catch(() => {})
         取(B + '/update').then((r) => set版本(r)).catch(() => {})
         const 计时 = setInterval(() => {
           取(B + '/state').then((s) => { if (s && s.ok) set状态(s) }).catch(() => {})
@@ -222,7 +220,6 @@ window.__ModuleLoader__.load({
 
       const 今天的额度 = String((状态 && 状态.saidToday) || 0)
       const 预览 = (状态 && 状态.injectPreview) || { state: 'pending', text: '' }
-      const 供应商型号 = ((厂商们 || []).find((p) => p.id === 设置.judgeProvider) || {}).models || []
       const 当前会话不在列表里 = Boolean(设置.targetSession)
         && 设置.targetSession !== '*'
         && !(会话们 || []).some((s) => s.id === 设置.targetSession)
@@ -324,11 +321,6 @@ window.__ModuleLoader__.load({
             onChange: (e) => set设置((旧) => ({ ...(旧 || {}), selfName: e.target.value })),
             onBlur: () => 改({ selfName: 设置.selfName }, '称呼'),
           }), '换成自己的名字，提示词里就跟着换。'),
-          行('TA 平时怎么叫你（昵称）', h('input', {
-            className: 'ym-field', value: 设置.selfAliases || '', placeholder: '小鱼,宝贝,亲爱的',
-            onChange: (e) => set设置((旧) => ({ ...(旧 || {}), selfAliases: e.target.value })),
-            onBlur: () => 改({ selfAliases: 设置.selfAliases }, '昵称'),
-          }), '逗号分隔。判断时这些词会被当成「在叫你」，不会把「宝宝视频」当成一个东西的名字。'),
         ),
         '两个名字都留空也不要紧：填了才换，不填就是中性的「对方 / 伙伴」。')
 
@@ -352,37 +344,6 @@ window.__ModuleLoader__.load({
           ? '选「所有会话」= 桌面 / 微信 / QQ 每个对话都判、都在各自对话里说。数值（心情和七根情绪）全局一份，理由按会话分开存 —— 别的对话里说过的话不会跑到这边来。换会话不用重启。'
           : '⚠️ 还没选会话 —— 选一个、或者选「所有会话」，心情才会开始判断和注入（现在什么都不做）。')
 
-      // ---------- 判断用哪个模型 ----------
-      const 模型卡 = 卡('判断用哪个模型',
-        堆(
-          行('provider（厂商）', h('select', {
-            className: 'ym-field', value: 设置.judgeProvider || '',
-            onChange: (e) => {
-              const 选中 = e.target.value
-              const 型号们 = ((厂商们 || []).find((p) => p.id === 选中) || {}).models || []
-              // 换厂商就顺手选它第一个型号，别留一个对不上的旧型号
-              改({ judgeProvider: 选中, judgeModel: 选中 ? ((型号们[0] && 型号们[0].id) || '') : '' }, '判断模型')
-            },
-          },
-            h('option', { key: 'none', value: '' }, '（跟着会话走）'),
-            (厂商们 || []).map((p) => h('option', { key: p.id, value: p.id }, p.name || p.id)),
-            设置.judgeProvider && !(厂商们 || []).some((p) => p.id === 设置.judgeProvider)
-              ? h('option', { key: 'cur', value: 设置.judgeProvider }, 设置.judgeProvider)
-              : null,
-          )),
-          行('model（型号）', h('select', {
-            className: 'ym-field', value: 设置.judgeModel || '', disabled: !设置.judgeProvider,
-            onChange: (e) => 改({ judgeModel: e.target.value }, '判断模型'),
-          },
-            h('option', { key: 'none', value: '' }, '（默认）'),
-            供应商型号.map((m) => h('option', { key: m.id, value: m.id }, m.name || m.id)),
-            设置.judgeModel && !供应商型号.some((m) => m.id === 设置.judgeModel)
-              ? h('option', { key: 'cur', value: 设置.judgeModel }, 设置.judgeModel)
-              : null,
-          )),
-        ),
-        '心情判断是一次很短的小调用：想更准就指到更强的模型，想省钱就指到便宜的；留空 = 跟着当前会话。')
-
       // ---------- 开关 ----------
       const 开关卡 = 卡('开关',
         堆(
@@ -396,28 +357,22 @@ window.__ModuleLoader__.load({
             h('option', { key: 'label', value: 'label' }, '只说心情，不说为什么'),
             h('option', { key: 'event', value: 'event' }, '说心情 + 那件事（推荐）'),
           ), '影响它口气的唯一开关。选「说心情 + 那件事」时它看到两行：第一行是这会儿的底子，第二行是这段时间发生了什么 —— 底子真的会影响它怎么说话，那件事只是来历。'),
-          数字('injectConfidence', '可信度门槛',
-            '判断模型自己对这次判断有多确定（0–100，默认 60）。低于这个数就只记进后台、不进它的嘴。调高更保守，调低更爱说。',
-            0, 100),
         ))
 
       // ---------- 数值 ----------
       const 数值卡 = 卡('心情怎么变',
         堆(
           数字('moodBase', '基线心情', '没事的时候心情会慢慢回到这个数（30–100）。', 30, 100),
-          数字('moodFloor', '心情下限', '最低能掉到多少；0 = 不设底线（0–100）。', 0, 100),
           数字('decayHalfHours', '多久平复一半',
             '受一次影响之后，心里多久淡掉一半（小时）。大 = 隔夜还留着余温，小 = 来得快去得也快。', 1, 168),
-          数字('sigMood', '心情变这么多才算',
-            '判定给的涨跌够这个数才算一次「真有事」（1–30，默认 3）。⚠️ 心情值本身每轮只吃 1/3，所以这里比的是判定的原始值。',
-            1, 30),
-          数字('sigDim', '或者某根情绪变这么多',
-            '任意一根涨跌够这个数也算（1–100，默认 5）。心疼+5、担心+5 这种「突然一下」才触发。', 1, 100),
+          数字('injectConfidence', '可信度门槛',
+            '判断模型自己对这次判断有多确定（0–100，默认 60）。低于这个数就只记进后台、不进它的嘴。调高更保守，调低更爱说。',
+            0, 100),
           数字('injectPerDay', '每天最多说几次',
             '今天已经说过 ' + 今天的额度 + ' 次。到上限就只记账、不再打扰它，明天重新算。填 0 = 一次都不说（只看面板）。',
             0, 50),
         ),
-        '上面两个数决定「什么才算一次值得告诉它的变化」：够不着就只记账（面板里看得到，不影响它说话）。调小它更敏感，调大它只在真动心的时候才变。')
+        '后面两个数决定「什么变化值得说给它听」：够不着就只记账（面板里看得到，不影响它说话）。可信度调高更保守，每天的额度调小更安静。')
 
       // ---------- 完整记录 ----------
       const 时间线 = (状态 && 状态.timeline) || []
@@ -451,7 +406,6 @@ window.__ModuleLoader__.load({
         预览卡,
         称呼卡,
         会话卡,
-        模型卡,
         开关卡,
         数值卡,
         记录卡,
